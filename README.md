@@ -76,7 +76,7 @@ To remove the library from your system type in the directory where you built the
 Create a hash for some fields:
 
 ```
-SELECT fields_sha1(customer_id, first_name, last_name, last_update) AS hash FROM customer WHERE customer_id=1;
+SELECT hex(fields_sha1(customer_id, first_name, last_name, last_update)) AS hash FROM customer WHERE customer_id=1;
     
 +------------------------------------------+
 | hash                                     |
@@ -85,18 +85,76 @@ SELECT fields_sha1(customer_id, first_name, last_name, last_update) AS hash FROM
 +------------------------------------------+
 ```
 
+Create a hash from static values:
+
+```
+SELECT hex(fields_sha1('This is a test')) AS hash;
+    
++------------------------------------------+
+| hash                                     |
++------------------------------------------+
+| A54D88E06612D820BC3BE72877C74F257B561B19 |
++------------------------------------------+
+
+SELECT SHA1('This is a test') as internal_hash;
+
++------------------------------------------+
+| internal_hash                            |
++------------------------------------------+
+| a54d88e06612d820bc3be72877c74f257b561b19 |
++------------------------------------------+
+
+```
+
+Create a hash from multiple static values. Note the difference between "fields_sha1()" in the first two examples and that theres no difference between the two last calls using "sha1()"
+
+```
+SELECT hex(fields_sha1('This is a |test', 'abc')) AS multi_hash;
++------------------------------------------+
+| multi_hash                               |
++------------------------------------------+
+| BB0318666AD1138192C575124F7E842820B485AA |
++------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT hex(fields_sha1('This is a ', 'test|abc')) AS multi_hash;
++------------------------------------------+
+| multi_hash                               |
++------------------------------------------+
+| 6ACC4FA9E180BB6BE73EDE8768C22D51FBEC5306 |
++------------------------------------------+
+1 row in set (0.01 sec)
+
+SELECT sha1(CONCAT_WS('|', 'This is a |test', 'abc')) AS internal_hash;
++------------------------------------------+
+| internal_hash                            |
++------------------------------------------+
+| 8b92198d1b00d577fca71ff1d6a5cc6891f84580 |
++------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT sha1(CONCAT_WS('|', 'This is a ', 'test|abc')) AS internal_hash;
++------------------------------------------+
+| internal_hash                            |
++------------------------------------------+
+| 8b92198d1b00d577fca71ff1d6a5cc6891f84580 |
++------------------------------------------+
+1 row in set (0.00 sec)
+
+```
+
 ###Internal escaping###
 
 As already mentioned the plugin uses an internally escaped separation character "|" to separate values. As this separation character gets escaped it is not possible to craft field values which would yield the same result.
 
 Assume the following calls
-SHA1(CONCAT('abc|def', 'ghi', '123')
-SHA1(CONCAT('abc', 'def|ghi', '123')
+SHA1(CONCAT_WS('|','abc|def', 'ghi', '123')
+SHA1(CONCAT_WS('|', 'abc', 'def|ghi', '123')
 
-If the "|" in passed values wasn't escaped internally the hashed value would be "abc|def|ghi|123" in both cases. But as internal escape happens the hashed values would be:
+If the "|" in passed values wasn't escaped internally the hashed value would be "abc|def|ghi|123" in both cases. But as internal escape happens the hashed values will be:
 
-'abc\|def|ghi|123'
-'abc|def\|ghi|123'
+'abc\\|def|ghi|123'
+'abc|def\\|ghi|123'
 
 As both strings are different the hash will also be. The "\" character itself gets also escaped. Every other character (byte) stays as is.
 
