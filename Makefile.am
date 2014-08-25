@@ -1,8 +1,8 @@
-lib_LTLIBRARIES = lib_mysqludf_skeleton.la
-lib_mysqludf_skeleton_la_SOURCES = lib_mysqludf_skeleton.c mysqludf.c
-lib_mysqludf_skeleton_la_CFLAGS = -DSTANDARD -DMYSQL_SERVER @MYSQL_CFLAGS@
-lib_mysqludf_skeleton_la_CXXFLAGS = -DSTANDARD -DMYSQL_SERVER @MYSQL_CFLAGS@
-lib_mysqludf_skeleton_la_LDFLAGS = -module -avoid-version -no-undefined -rpath @MYSQL_PLUGINDIR@
+lib_LTLIBRARIES = lib_mysqludf_fields_sha1.la
+lib_mysqludf_fields_sha1_la_SOURCES = lib_mysqludf_fields_sha1.c
+lib_mysqludf_fields_sha1_la_CFLAGS = -DSTANDARD -DMYSQL_SERVER @MYSQL_CFLAGS@
+lib_mysqludf_fields_sha1_la_CXXFLAGS = -DSTANDARD -DMYSQL_SERVER @MYSQL_CFLAGS@
+lib_mysqludf_fields_sha1_la_LDFLAGS = -module -avoid-version -no-undefined -rpath @MYSQL_PLUGINDIR@ -lcrypto
 
 EXTRA_DIST = *.h *.sql
 SUBDIRS = test

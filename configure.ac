@@ -1,6 +1,6 @@
 AC_PREREQ(2.59)
 
-AC_INIT(lib_mysqludf_skeleton,0.0.1,you@example.com)
+AC_INIT(lib_mysqludf_fields_sha1,0.0.1,kraftb@think-open.at)
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
